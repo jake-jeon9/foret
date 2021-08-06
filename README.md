@@ -5,6 +5,13 @@
 ![ezgif com-gif-maker (1)](https://user-images.githubusercontent.com/45132207/102478967-9d6cd600-40a1-11eb-8e72-37fd236d0c79.gif)
 ![foret](https://user-images.githubusercontent.com/45132207/102469885-a2785800-4096-11eb-8da7-56e48ef2f2be.png)
 
+# Foret APP VER 1.1
+-각종 오류 수정
+-서버 GCP 에서 aws 로 변경(현재 운영중)
+-속도개선 등
+
+
+
 
 # Foret APP VER 1.0
 온라인 스터디 모임 어플
