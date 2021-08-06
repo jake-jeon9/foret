@@ -36,6 +36,7 @@ import com.example.foret_app_prototype.activity.menu.MyInfoActivity;
 import com.example.foret_app_prototype.activity.notify.NotifyFragment;
 import com.example.foret_app_prototype.activity.notify.Token;
 import com.example.foret_app_prototype.activity.search.SearchFragment;
+import com.example.foret_app_prototype.helper.getIPAdress;
 import com.example.foret_app_prototype.model.MemberDTO;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -79,7 +80,7 @@ public class MainActivity extends AppCompatActivity
     MemberDTO memberDTO;
     AsyncHttpClient client;
     HttpResponse response;
-    String url = "http://34.72.240.24:8085/foret/search/member.do";
+    String url = getIPAdress.getInstance().getIp()+"/foret/search/member.do";
     // String url = "http://192.168.0.180:8085/foret/search/member.do";
     TextView button_out, drawer_text1, drawer_text2, drawer_text3, drawer_text4;
     ImageView button_out2, button_drawcancel, profile;
@@ -309,17 +310,18 @@ public class MainActivity extends AppCompatActivity
                     LoginActivity loginActivity = (LoginActivity) LoginActivity.loginActivity;
                     // 세션에 담아서 로그인 페이지로
                     Log.e("[test]","세션 담기전 DTO?"+memberDTO+toString());
-                    SessionManager sessionManager = new SessionManager(loginActivity);
+                    //sessionManager = new SessionManager(loginActivity);
                     sessionManager.saveSession(memberDTO);
 
                     // 데이터 셋팅 HERE ----------------
                     // Toast.makeText(MainActivity.this, memberDTO.toString(),
                     // Toast.LENGTH_SHORT).show();
-
+                    //Log.e("[test]","main에서 옆메뉴 확인1"+memberDTO.getNickname());
                     fillTextView(R.id.drawer_text1, memberDTO.getNickname());
                     fillTextView(R.id.drawer_text2, memberDTO.getEmail());
                     fillTextView(R.id.drawer_text3, memberDTO.getId() + "");
                     fillTextView(R.id.drawer_text4, memberDTO.getReg_date());
+
                     try {
                         // 사진이 있을 떄
                         intoImage(context, memberDTO.getPhoto(), R.id.drawer_profile);
@@ -421,6 +423,7 @@ public class MainActivity extends AppCompatActivity
         onlineStatus.put("listlogined_date", "Last Seen at : " + dateTime);
         userAcitive.updateChildren(onlineStatus);
     }
+
 
     public void fillTextView(int id, String text) {
         TextView tv = (TextView) findViewById(id);

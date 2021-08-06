@@ -23,6 +23,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.foret_app_prototype.R;
+import com.example.foret_app_prototype.helper.getIPAdress;
 import com.example.foret_app_prototype.model.FBCommentDTO;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
@@ -123,7 +124,7 @@ public class CommentBoardAdapter extends RecyclerView.Adapter<CommentBoardAdapte
                 params.put("content", holder.editText.getText().toString());
                 switch (actionId) {
                     case EditorInfo.IME_ACTION_SEND : //수정하기
-                        client.post("http://34.72.240.24:8085/foret/comment/comment_modify.do", params, modifyResponse);
+                        client.post(getIPAdress.getInstance().getIp()+"/foret/comment/comment_modify.do", params, modifyResponse);
                         holder.textView2.setText(holder.editText.getText().toString().trim());
                         holder.textView2.setVisibility(View.VISIBLE);
                         holder.editText.setVisibility(View.GONE);
@@ -134,7 +135,7 @@ public class CommentBoardAdapter extends RecyclerView.Adapter<CommentBoardAdapte
                         break;
                     default :
                         Toast.makeText(activity, "엔터쳤을때", Toast.LENGTH_SHORT).show();
-                        client.post("http://34.72.240.24:8085/foret/comment/comment_modify.do", params, modifyResponse);
+                        client.post(getIPAdress.getInstance().getIp()+"/foret/comment/comment_modify.do", params, modifyResponse);
                         break;
                 }
                 return false;
@@ -156,7 +157,7 @@ public class CommentBoardAdapter extends RecyclerView.Adapter<CommentBoardAdapte
                 commentClickListener.onDeleteButtonClick(true);
                 RequestParams params = new RequestParams();
                 params.put("comment_id", commentID);
-                client.post("http://34.72.240.24:8085/foret/comment/comment_delete.do", params, deleteResponse);
+                client.post(getIPAdress.getInstance().getIp()+"/foret/comment/comment_delete.do", params, deleteResponse);
             }
         });
         builder.setNegativeButton("취소", null);

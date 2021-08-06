@@ -19,6 +19,7 @@ import androidx.viewpager.widget.ViewPager;
 import com.bumptech.glide.Glide;
 import com.example.foret_app_prototype.R;
 import com.example.foret_app_prototype.activity.foret.board.ReadForetBoardActivity;
+import com.example.foret_app_prototype.helper.getIPAdress;
 import com.example.foret_app_prototype.model.ForetBoardDTO;
 import com.example.foret_app_prototype.model.MemberDTO;
 import com.google.android.material.tabs.TabLayout;
@@ -30,6 +31,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.List;
 
@@ -94,7 +96,7 @@ public class BoardViewAdapter extends RecyclerView.Adapter<BoardViewAdapter.View
         getWriter(foretBoardDTO.getWriter());
 
         String photopath = Arrays.toString(foretBoardDTO.getPhoto()).replace("[", "").replace("]", "");
-        String convertImageUrl = "http://34.72.240.24:8085/foret/storage/" +photopath;
+        String convertImageUrl = getIPAdress.getInstance().getIp()+"/foret/storage/" +photopath;
 
 
 
@@ -129,7 +131,7 @@ public class BoardViewAdapter extends RecyclerView.Adapter<BoardViewAdapter.View
             public void onClick(View v) {
                 if(viewHolder.like_btn.isChecked()) {
                     like_count++;
-                    viewHolder.like_count.setText(like_count+"");
+                    viewHolder.like_count.setText("공감("+like_count+")");
                 } else {
                     like_count--;
                     viewHolder.like_count.setText(like_count + "");
@@ -142,9 +144,9 @@ public class BoardViewAdapter extends RecyclerView.Adapter<BoardViewAdapter.View
                     params.put("board_id", foretBoardDTO.getId());
                     params.put("type", 4);
                     if(initial_likecount > like_count) { //좋아요 수가 1감소함->좋아요 삭제
-                        client.post("http://34.72.240.24:8085/foret/member/member_board_dislike.do", params, likeChangeResponse);
+                        client.post(getIPAdress.getInstance().getIp()+"/foret/member/member_board_dislike.do", params, likeChangeResponse);
                     } else { //어차피 초반 if문이 처음 좋아요개수가 같지 않을때 였으므로 else를 쓰면 라이크 수가 증가한 경우만 해당
-                        client.post("http://34.72.240.24:8085/foret/member/member_board_like.do", params, likeChangeResponse);
+                        client.post(getIPAdress.getInstance().getIp()+"/foret/member/member_board_like.do", params, likeChangeResponse);
                     }
                 }
                 notifyItemChanged(position);
@@ -154,20 +156,26 @@ public class BoardViewAdapter extends RecyclerView.Adapter<BoardViewAdapter.View
         viewHolder.linearLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(activity, ReadForetBoardActivity.class);
-                intent.putExtra("board_id", foretBoardDTO.getId());
-                intent.putExtra("memberDTO", memberDTO);
-                Log.d("[Test]", "memberDTO  => " + memberDTO.getId());
-                activity.startActivity(intent);
+                if (foretBoardDTO.getId() > 0) {
+                    Intent intent = new Intent(activity, ReadForetBoardActivity.class);
+                    intent.putExtra("board_id", foretBoardDTO.getId());
+                    intent.putExtra("memberDTO", memberDTO);
+                    Log.d("[Test]", "memberDTO  => " + memberDTO.getId());
+                    activity.startActivity(intent);
+                } else {
+                    Toast.makeText(activity.getBaseContext(), "등록된 글이 없습니다.", Toast.LENGTH_LONG).show();
+                }
             }
         });
-
     }
 
     private void getWriter(int id) {
+        if(id==0) return;
         RequestParams params = new RequestParams();
         params.put("id", id);
-        client.post("http://34.72.240.24:8085/foret/search/member.do", params, writerResponse);
+        //Log.d("-----------[][][]","id?"+id+"[][][]------------");
+
+        client.post(getIPAdress.getInstance().getIp()+"/foret/search/member.do", params, writerResponse);
     }
 
 
@@ -245,7 +253,7 @@ public class BoardViewAdapter extends RecyclerView.Adapter<BoardViewAdapter.View
                     writer = temp.getString("nickname");
                     if(!temp.isNull("photo")){
                         ImageView imageView = getWriterPhoto();
-                        String convertImageUrl = "http://34.72.240.24:8085/foret/storage/" + temp.getString("photo");
+                        String convertImageUrl = getIPAdress.getInstance().getIp()+"/foret/storage/" + temp.getString("photo");
                         Glide.with(activity).load(convertImageUrl).fallback(R.drawable.icon_defalut).into(imageView);
                     }
                     TextView textView = getTextViewWriter();

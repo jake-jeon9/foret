@@ -18,6 +18,7 @@ import androidx.core.content.ContextCompat;
 
 import com.example.foret_app_prototype.R;
 import com.example.foret_app_prototype.activity.login.SessionManager;
+import com.example.foret_app_prototype.helper.getIPAdress;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
@@ -98,7 +99,7 @@ public class WriteFreeActivity extends AppCompatActivity {
                     e.printStackTrace();
                 }
                 params.setForceMultipartEntityContentType(true);
-                client.post("http://34.72.240.24:8085/foret/board/board_insert.do", params, response);
+                client.post(getIPAdress.getInstance().getIp()+"/foret/board/board_insert.do", params, response);
                 break;
         }
         return super.onOptionsItemSelected(item);

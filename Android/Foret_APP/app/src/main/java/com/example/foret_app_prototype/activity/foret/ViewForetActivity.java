@@ -23,6 +23,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.RecyclerView.OnScrollListener;
 
 import com.bumptech.glide.Glide;
 import com.example.foret_app_prototype.R;
@@ -36,6 +37,8 @@ import com.example.foret_app_prototype.activity.notify.Token;
 import com.example.foret_app_prototype.activity.search.SearchFragment;
 import com.example.foret_app_prototype.adapter.foret.BoardViewAdapter;
 import com.example.foret_app_prototype.adapter.foret.ViewForetBoardAdapter;
+import com.example.foret_app_prototype.helper.getIPAdress;
+import com.example.foret_app_prototype.model.Foret;
 import com.example.foret_app_prototype.model.ForetBoardDTO;
 import com.example.foret_app_prototype.model.ForetDTO;
 import com.example.foret_app_prototype.model.ForetViewDTO;
@@ -179,7 +182,7 @@ public class ViewForetActivity extends AppCompatActivity implements View.OnClick
         super.onResume();
 //        getForet(); // 포레 정보
 
-        board_list.addOnScrollListener(new RecyclerView.OnScrollListener() {
+        board_list.addOnScrollListener(new OnScrollListener() {
             @Override
             public void onScrollStateChanged(@NonNull RecyclerView board_list, int newState) {
                 super.onScrollStateChanged(board_list, newState);
@@ -221,7 +224,7 @@ public class ViewForetActivity extends AppCompatActivity implements View.OnClick
     }
 
     private void getMember() {
-        url = "http://34.72.240.24:8085/foret/search/member.do";
+        url = getIPAdress.getInstance().getIp()+"/foret/search/member.do";
         client = new AsyncHttpClient();
         memberResponse = new MemberResponse();
         RequestParams params = new RequestParams();
@@ -230,7 +233,7 @@ public class ViewForetActivity extends AppCompatActivity implements View.OnClick
     }
 
     private void getLeader() {
-        url = "http://34.72.240.24:8085/foret/search/member.do";
+        url = getIPAdress.getInstance().getIp()+"/foret/search/member.do";
         client = new AsyncHttpClient();
         leaderResponse = new LeaderResponse();
         RequestParams params = new RequestParams();
@@ -239,7 +242,7 @@ public class ViewForetActivity extends AppCompatActivity implements View.OnClick
     }
 
     private void getForet() {
-        url = "http://34.72.240.24:8085/foret/search/foretSelect.do";
+        url = getIPAdress.getInstance().getIp()+"/foret/search/foretSelect.do";
         client = new AsyncHttpClient();
         viewForetResponse = new ViewForetResponse();
         RequestParams params = new RequestParams();
@@ -252,7 +255,7 @@ public class ViewForetActivity extends AppCompatActivity implements View.OnClick
     }
 
     private void getNotice() {
-        url = "http://34.72.240.24:8085/foret/search/boardList.do";
+        url = getIPAdress.getInstance().getIp()+"/foret/search/boardList.do";
         client = new AsyncHttpClient();
         noticeResponse = new NoticeResponse();
         RequestParams params = new RequestParams();
@@ -265,7 +268,7 @@ public class ViewForetActivity extends AppCompatActivity implements View.OnClick
     }
 
     private void getBoard() {
-        url = "http://34.72.240.24:8085/foret/search/boardList.do";
+        url = getIPAdress.getInstance().getIp()+"/foret/search/boardList.do";
         client = new AsyncHttpClient();
         boardResponse = new BoardResponse();
         RequestParams params = new RequestParams();
@@ -278,7 +281,7 @@ public class ViewForetActivity extends AppCompatActivity implements View.OnClick
     }
 
     private void getTotalBoard() {
-        url = "http://34.72.240.24:8085/foret/search/boardList.do";
+        url = getIPAdress.getInstance().getIp()+"/foret/search/boardList.do";
         client = new AsyncHttpClient();
         boardTotalResponse = new BoardTotalResponse();
         RequestParams params = new RequestParams();
@@ -289,7 +292,7 @@ public class ViewForetActivity extends AppCompatActivity implements View.OnClick
     }
 
     private void getTotalNotice() {
-        url = "http://34.72.240.24:8085/foret/search/boardList.do";
+        url = getIPAdress.getInstance().getIp()+"/foret/search/boardList.do";
         client = new AsyncHttpClient();
         noticeTotalResponse = new NoticeTotalResponse();
         RequestParams params = new RequestParams();
@@ -300,7 +303,7 @@ public class ViewForetActivity extends AppCompatActivity implements View.OnClick
     }
 
     private void foretJoin() {
-        url = "http://34.72.240.24:8085/foret/foret/foret_member_insert.do";
+        url = getIPAdress.getInstance().getIp()+"/foret/foret/foret_member_insert.do";
         client = new AsyncHttpClient();
         joinResponse = new JoinResponse();
         RequestParams params = new RequestParams();
@@ -310,7 +313,7 @@ public class ViewForetActivity extends AppCompatActivity implements View.OnClick
     }
 
     private void foretLeave() {
-        url = "http://34.72.240.24:8085/foret/foret/foret_member_delete.do";
+        url = getIPAdress.getInstance().getIp()+"/foret/foret/foret_member_delete.do";
         client = new AsyncHttpClient();
         leaveResponse = new LeaveResponse();
         RequestParams params = new RequestParams();
@@ -349,7 +352,7 @@ public class ViewForetActivity extends AppCompatActivity implements View.OnClick
 
     private void dataSetting() {
 
-        if(!foretViewDTO.getPhoto().equals("http://34.72.240.24:8085/foret/storage/null")){
+        if(!foretViewDTO.getPhoto().equals("null") || (foretViewDTO.getPhoto() != null)){
             Glide.with(this).load(foretViewDTO.getPhoto()).
                     placeholder(R.drawable.sss).
                     error(R.drawable.sss)
@@ -414,8 +417,9 @@ public class ViewForetActivity extends AppCompatActivity implements View.OnClick
                 break;
             case R.id.button3: // 가입하고 있고, 관리자일 때 -> 수정하기 화면으로 이동
                 intent = new Intent(this, EditForetActivity.class);
-                intent.putExtra("foretViewDTO", foretViewDTO);
+                intent.putExtra("foret", foretViewDTO);
                 intent.putExtra("memberDTO", memberDTO);
+                intent.putExtra("leader",foret_leader);
                 startActivity(intent);
                 break;
             case R.id.button10: // 공지사항 다음
@@ -1082,4 +1086,5 @@ public class ViewForetActivity extends AppCompatActivity implements View.OnClick
             }
         });
     }
+
 }

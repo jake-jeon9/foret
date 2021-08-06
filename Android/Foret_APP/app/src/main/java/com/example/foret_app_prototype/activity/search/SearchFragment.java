@@ -38,10 +38,12 @@ import com.example.foret_app_prototype.activity.foret.MakeForetActivity;
 import com.example.foret_app_prototype.activity.foret.ViewForetActivity;
 import com.example.foret_app_prototype.activity.login.SessionManager;
 import com.example.foret_app_prototype.activity.menu.EditMyInfoActivity;
+import com.example.foret_app_prototype.activity.menu.MyInfoActivity;
 import com.example.foret_app_prototype.adapter.search.RecyclerAdapter2;
 import com.example.foret_app_prototype.adapter.search.RecyclerAdapter3;
 import com.example.foret_app_prototype.adapter.search.SearchAdapter;
 import com.example.foret_app_prototype.helper.ProgressDialogHelper;
+import com.example.foret_app_prototype.helper.getIPAdress;
 import com.example.foret_app_prototype.model.ForetDTO;
 import com.example.foret_app_prototype.model.MemberDTO;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -153,8 +155,7 @@ public class SearchFragment extends Fragment implements View.OnClickListener,
         region_si = new ArrayList<>();
         search_resultList = new ArrayList<>();
         foretDTO = new ForetDTO();
-
-        searchAdapter = new SearchAdapter(context, R.layout.recycle_item3, search_resultList, memberDTO);
+        searchAdapter = new SearchAdapter(getContext(), R.layout.recycle_item3, search_resultList, memberDTO);
 
         autoCompleteList = new ArrayList<String>(); //자동완성에 사용할 데이터
 
@@ -207,19 +208,19 @@ public class SearchFragment extends Fragment implements View.OnClickListener,
     private void hotTagData() {
         RequestParams params = new RequestParams();
         params.put("rank", 5);
-        client.post("http://34.72.240.24:8085/foret/tag/tag_rank.do", params, new HotTagResponse());
+        client.post(getIPAdress.getInstance().getIp()+"/foret/tag/tag_rank.do", params, new HotTagResponse());
     }
 
     private void recommandForetData() {
         RequestParams params = new RequestParams();
         params.put("rank", 15);
-        client.post("http://34.72.240.24:8085/foret/search/foret_rank.do", params, recommandListResponse);
+        client.post(getIPAdress.getInstance().getIp()+"/foret/search/foret_rank.do", params, recommandListResponse);
     }
 
     private void autoCompleteData() {
         RequestParams params = new RequestParams();
         params.put("type", "name");
-        client.post("http://34.72.240.24:8085/foret/search/search_keyword.do", new TagListResponse4());
+        client.post(getIPAdress.getInstance().getIp()+"/foret/search/search_keyword.do", new TagListResponse4());
     }
 
     @Override
@@ -250,8 +251,9 @@ public class SearchFragment extends Fragment implements View.OnClickListener,
         String keyword = "";
         switch (v.getId()) {
             case R.id.button1: //내 관심 설정페이지로 이동
-                intent = new Intent(context, EditMyInfoActivity.class);
+                intent = new Intent(context, MyInfoActivity.class);
                 intent.putExtra("memberDTO", memberDTO);
+
                 startActivity(intent);
                 Toast.makeText(context, "내 관심 설정 페이지로 이동", Toast.LENGTH_SHORT).show();
                 break;
@@ -317,7 +319,7 @@ public class SearchFragment extends Fragment implements View.OnClickListener,
         }
         params.put("name", keyword);
         Log.e("[keyword]", keyword);
-        client.post("http://34.72.240.24:8085/foret/search/foret_keyword_search.do", params, keywordSearchResultResponse);
+        client.post(getIPAdress.getInstance().getIp()+"/foret/search/foret_keyword_search.do", params, keywordSearchResultResponse);
     }
 
     //검색결과 요청
@@ -341,7 +343,7 @@ public class SearchFragment extends Fragment implements View.OnClickListener,
         }
         params.put("name", search_word);
         Log.e("[keyword]", search_word);
-        client.post("http://34.72.240.24:8085/foret/search/foret_keyword_search.do", params, keywordSearchResultResponse);
+        client.post(getIPAdress.getInstance().getIp()+"/foret/search/foret_keyword_search.do", params, keywordSearchResultResponse);
         //검색 요청시 키보드를 내려줘야 한다.
         inputMethodManager.hideSoftInputFromWindow(autoCompleteTextView.getWindowToken(), 0);
         Toast.makeText(context, search_word+"를 검색합니다.", Toast.LENGTH_SHORT).show();
@@ -578,7 +580,9 @@ public class SearchFragment extends Fragment implements View.OnClickListener,
                         searchAdapter.add(foretDTO);
                         Log.e("어댑터 사이즈", searchAdapter.getCount()+"");
                     }
-                    Toast.makeText(context, "검색 완료", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, "검색결과 : "+searchAdapter.getCount()+"건", Toast.LENGTH_SHORT).show();
+                }else{
+                    Toast.makeText(context, "검색 결과가 없습니다.", Toast.LENGTH_SHORT).show();
                 }
                 ProgressDialogHelper.getInstance().removeProgressbar();
             } catch (JSONException e) {
@@ -589,7 +593,7 @@ public class SearchFragment extends Fragment implements View.OnClickListener,
 
         @Override
         public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
-            Toast.makeText(context, "검색 결과가 없습니다.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, "오류 발생 잠시 후 다시 시도해주세요.", Toast.LENGTH_SHORT).show();
             ProgressDialogHelper.getInstance().removeProgressbar();
         }
     }

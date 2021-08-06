@@ -24,6 +24,7 @@ import androidx.core.content.ContextCompat;
 import com.bumptech.glide.Glide;
 import com.example.foret_app_prototype.R;
 import com.example.foret_app_prototype.activity.login.SplashActivity;
+import com.example.foret_app_prototype.helper.getIPAdress;
 import com.example.foret_app_prototype.model.MemberDTO;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -155,7 +156,7 @@ public class MyInfoActivity extends AppCompatActivity implements View.OnClickLis
             public void onClick(DialogInterface dialog, int which) {
                 RequestParams params = new RequestParams();
                 params.put("id", memberDTO.getId());
-                client.post("http://34.72.240.24:8085/foret/member/member_delete.do", params, deleteResponse);
+                client.post(getIPAdress.getInstance().getIp()+"/foret/member/member_delete.do", params, deleteResponse);
             }
         });
         builder.setNegativeButton("취소", null);

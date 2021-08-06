@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -59,11 +60,15 @@ public class ViewForetBoardAdapter extends RecyclerView.Adapter<ViewForetBoardAd
         viewHolder.layout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(activity, ReadForetBoardActivity.class);
-                intent.putExtra("memberDTO", memberDTO);
-                intent.putExtra("board_id", foretBoardDTO.getId());
-                intent.putExtra("foretBoardDTOList", (Serializable) foretBoardDTOList);
-                activity.startActivity(intent);
+                if(foretBoardDTO.getId() >0) {
+                    Intent intent = new Intent(activity, ReadForetBoardActivity.class);
+                    intent.putExtra("memberDTO", memberDTO);
+                    intent.putExtra("board_id", foretBoardDTO.getId());
+                    intent.putExtra("foretBoardDTOList", (Serializable) foretBoardDTOList);
+                    activity.startActivity(intent);
+                }else{
+                    Toast.makeText(activity.getBaseContext(),"아직 등록된 공지글이 없습니다.",Toast.LENGTH_LONG).show();
+                }
             }
         });
     }

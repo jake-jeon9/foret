@@ -39,6 +39,7 @@ import com.example.foret_app_prototype.helper.CalendarHelper;
 import com.example.foret_app_prototype.helper.FileUtils;
 import com.example.foret_app_prototype.helper.PhotoHelper;
 import com.example.foret_app_prototype.helper.ProgressDialogHelper;
+import com.example.foret_app_prototype.helper.getIPAdress;
 import com.example.foret_app_prototype.model.Member;
 import com.example.foret_app_prototype.model.MemberDTO;
 import com.example.foret_app_prototype.model.ModelUser;
@@ -193,7 +194,7 @@ public class GuideActivity extends AppCompatActivity implements View.OnClickList
 
         //각 지역, 태그 리스트에 DB에 저장된 목록 저장
         //client.post("http://34.72.240.24:8085/foret/region/region_list.do", regionListResponse);
-        client.post("http://34.72.240.24:8085/foret/tag/tag_list.do", tagListResponse);
+        client.post(getIPAdress.getInstance().getIp()+"/foret/tag/tag_list.do", tagListResponse);
 
     }
 
@@ -705,7 +706,7 @@ public class GuideActivity extends AppCompatActivity implements View.OnClickList
 
         params.put("deviceToken", deviceToken);
         Log.e("[test]", name + ", " + email + ", " + pw2 + ", " + birth + ", " + nickname);
-        String url = "http://34.72.240.24:8085/foret/member/member_insert.do";
+        String url = getIPAdress.getInstance().getIp()+"/foret/member/member_insert.do";
         try {
             if (file != null)
                 params.put("photo", file);
@@ -826,7 +827,7 @@ public class GuideActivity extends AppCompatActivity implements View.OnClickList
                             updateNewItem("PUBLIC_NOTICE_NEW_ITEM", uid, uid, "신규 가입을 환영합니다.", "" + System.currentTimeMillis());
 
                             //파이어 베이스 이미지 생성
-                            if (uri.equals("") || uri == null) {
+                            if ( uri == null || uri.equals("") ) {
                                 ProgressDialogHelper.getInstance().removeProgressbar();
                                 intent = new Intent(GuideActivity.this, MainActivity.class);
                                 startActivity(intent);

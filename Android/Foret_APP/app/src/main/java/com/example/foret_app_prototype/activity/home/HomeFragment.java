@@ -11,6 +11,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -32,6 +33,7 @@ import com.example.foret_app_prototype.activity.search.SearchFragment;
 import com.example.foret_app_prototype.adapter.foret.ForetAdapter;
 import com.example.foret_app_prototype.adapter.foret.ForetBoardAdapter;
 import com.example.foret_app_prototype.adapter.foret.NewBoardFeedAdapter;
+import com.example.foret_app_prototype.helper.getIPAdress;
 import com.example.foret_app_prototype.model.HomeForetBoardDTO;
 import com.example.foret_app_prototype.model.HomeForetDTO;
 import com.example.foret_app_prototype.model.MemberDTO;
@@ -110,7 +112,6 @@ public class HomeFragment extends Fragment implements ViewPager.OnPageChangeList
         intent = activity.getIntent();
         searchFragment = new SearchFragment(context);
         homeFragment = new HomeFragment(context);
-
         // 뷰페이저(포레)
         viewPager = rootView.findViewById(R.id.viewPager);
         viewPager.setOnPageChangeListener(this);
@@ -125,7 +126,7 @@ public class HomeFragment extends Fragment implements ViewPager.OnPageChangeList
     }
 
     private void getMember(String id) {
-        url = "http://34.72.240.24:8085/foret/search/member.do";
+        url = getIPAdress.getInstance().getIp()+"/foret/search/member.do";
         client = new AsyncHttpClient();
         memberResponse = new MemberResponse();
         RequestParams params = new RequestParams();
@@ -134,7 +135,7 @@ public class HomeFragment extends Fragment implements ViewPager.OnPageChangeList
     }
 
     private void getHomeData() {
-        url = "http://34.72.240.24:8085/foret/search/home.do";
+        url = getIPAdress.getInstance().getIp()+"/foret/search/home.do";
         client = new AsyncHttpClient();
 
         final int DEFAULT_TIME = 50 * 1000;
@@ -318,6 +319,7 @@ public class HomeFragment extends Fragment implements ViewPager.OnPageChangeList
                     Log.d("[member]", "이멜 가져옴 ==== " + memberDTO.getEmail());
                     Log.d("[member]", "비번 가져옴 ==== " + memberDTO.getPassword());
                     Log.d("[member]", "가입일 가져옴 ==== " + memberDTO.getReg_date());
+
 
                     getHomeData();
                 } else {

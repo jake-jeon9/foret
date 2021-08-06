@@ -34,6 +34,7 @@ import com.bumptech.glide.Glide;
 import com.example.foret_app_prototype.R;
 import com.example.foret_app_prototype.helper.FileUtils;
 import com.example.foret_app_prototype.helper.PhotoHelper;
+import com.example.foret_app_prototype.helper.getIPAdress;
 import com.example.foret_app_prototype.model.ForetBoardDTO;
 import com.example.foret_app_prototype.model.MemberDTO;
 import com.example.foret_app_prototype.model.ReadForetDTO;
@@ -234,7 +235,7 @@ public class EditForetBoardActivity extends AppCompatActivity
             return;
         }
 
-        url = "http://34.72.240.24:8085/foret/board/board_modify.do";
+        url = getIPAdress.getInstance().getIp()+"/foret/board/board_modify.do";
         client = new AsyncHttpClient();
         editForetBoardResponse = new EditForetBoardResponse();
         RequestParams params = new RequestParams();
@@ -264,7 +265,7 @@ public class EditForetBoardActivity extends AppCompatActivity
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()){
             case R.id.item_complete : // 완료 버튼
-                modify();
+                modifyCheck();
                 break;
             case android.R.id.home : // 뒤로가기 버튼
                 finish();
@@ -279,10 +280,7 @@ public class EditForetBoardActivity extends AppCompatActivity
         builder.setPositiveButton("수정", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                Toast.makeText(getApplicationContext(), "게시글을 수정했습니다.", Toast.LENGTH_SHORT).show();
-                Intent intent = new Intent(EditForetBoardActivity.this, ReadForetBoardActivity.class);
-                startActivity(intent);
-                finish();
+                modify();
             }
         });
         builder.setNegativeButton("취소", null);
@@ -455,9 +453,10 @@ public class EditForetBoardActivity extends AppCompatActivity
             String str = new String(responseBody);
             try {
                 JSONObject json = new JSONObject(str);
-                String rt = json.getString("rt");
+                String rt = json.getString("boardRT");
                 if(rt.equals("OK")) {
-                    modifyCheck();
+                    Toast.makeText(getApplicationContext(), "게시글을 수정했습니다.", Toast.LENGTH_SHORT).show();
+                    finish();
                 } else {
                     Toast.makeText(EditForetBoardActivity.this, "게시판을 수정하지 못했습니다.", Toast.LENGTH_SHORT).show();
                 }

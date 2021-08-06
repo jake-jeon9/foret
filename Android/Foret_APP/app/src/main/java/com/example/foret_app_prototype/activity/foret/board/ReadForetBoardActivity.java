@@ -47,6 +47,7 @@ import com.example.foret_app_prototype.adapter.foret.CommentBoardAdapter;
 import com.example.foret_app_prototype.adapter.foret.CommentsAdapter;
 import com.example.foret_app_prototype.adapter.foret.ReadViewPagerAdapter;
 import com.example.foret_app_prototype.adapter.free.CommentListFreeBoardAdapter;
+import com.example.foret_app_prototype.helper.getIPAdress;
 import com.example.foret_app_prototype.model.FBCommentDTO;
 import com.example.foret_app_prototype.model.ForetBoard;
 import com.example.foret_app_prototype.model.ForetBoardComment;
@@ -202,7 +203,7 @@ public class ReadForetBoardActivity extends AppCompatActivity implements View.On
 
     private void getBoard(int board_id) {
         //글 불러오기
-        url = "http://34.72.240.24:8085/foret/search/boardSelect.do";
+        url = getIPAdress.getInstance().getIp()+"/foret/search/boardSelect.do";
         RequestParams params = new RequestParams();
         params.put("id", board_id);
         client.post(url, params, viewResponse);
@@ -211,12 +212,19 @@ public class ReadForetBoardActivity extends AppCompatActivity implements View.On
     //좋아요 수 변화 때문에 반드시 서버에서 데이터 불러오거나 할것
     private void setDataBoard(ReadForetDTO foretBoardDTO) {
 
-        if (foretBoardDTO.getWriter_photo() != null) {
-            Glide.with(this).load(foretBoardDTO.getWriter_photo())
-                    .placeholder(R.drawable.icon_defalut).into(image_profile);
-        } else {
-            Glide.with(this).load(R.drawable.icon4).into(image_profile);
-        }
+//        if (foretBoardDTO.getWriter_photo() != null) {
+//            Glide.with(this).load(foretBoardDTO.getWriter_photo())
+//                    .placeholder(R.drawable.icon_defalut).into(image_profile);
+//        } else {
+//            Glide.with(this).load(R.drawable.icon4).into(image_profile);
+//        }
+            Glide.with(this).load(foretBoardDTO.getWriter_photo()).
+                    placeholder(R.drawable.icon4).
+                    error(R.drawable.icon4)
+                    .into(image_profile);
+
+
+
         textView_writer.setText(foretBoardDTO.getWriter_nickname());
         textView_subject.setText(foretBoardDTO.getSubject());
         textView_content.setText(foretBoardDTO.getContent());
@@ -236,7 +244,7 @@ public class ReadForetBoardActivity extends AppCompatActivity implements View.On
         for (int a = 0; a < photoSize; a++) {
             if(!test.removeAll(Collections.singleton(null))){
                 Log.e("[test]", "포토 어레?" + foretBoardDTO.getPhoto().get(a).replace("[", "").replace("]", ""));
-                photolist.add("http://34.72.240.24:8085/foret/storage/" + foretBoardDTO.getPhoto().get(a).toString().replace("[", "").replace("]", ""));
+                photolist.add(getIPAdress.getInstance().getIp()+"/foret/storage/" + foretBoardDTO.getPhoto().get(a).toString().replace("[", "").replace("]", ""));
             }
 
         }
@@ -263,7 +271,7 @@ public class ReadForetBoardActivity extends AppCompatActivity implements View.On
         if (noGet != 0) {
             commentlist.clear();
             //글 불러오기
-            url = "http://34.72.240.24:8085/foret/search/boardSelect.do";
+            url = getIPAdress.getInstance().getIp()+"/foret/search/boardSelect.do";
             RequestParams params = new RequestParams();
             params.put("id", foretBoardDTO.getId());
             client.post(url, params, viewResponse);
@@ -333,7 +341,7 @@ public class ReadForetBoardActivity extends AppCompatActivity implements View.On
         foretBoardComment.setContent(comment);
 
         RequestParams params = new RequestParams();
-        url = "http://34.72.240.24:8085/foret/comment/recomment_insert.do";
+        url = getIPAdress.getInstance().getIp()+"/foret/comment/recomment_insert.do";
         params.put("board_id", foretBoardDTO.getId());
         params.put("writer", memberDTO.getId());
         params.put("content", editText_comment.getText().toString().trim());
@@ -393,9 +401,9 @@ public class ReadForetBoardActivity extends AppCompatActivity implements View.On
             params.put("board_id", foretBoardDTO.getId());
             params.put("type", 0);
             if (initial_likecount > like_count) { //좋아요 수가 1감소함->좋아요 삭제
-                client.post("http://34.72.240.24:8085/foret/member/member_board_dislike.do", params, likeChangeResponse);
+                client.post(getIPAdress.getInstance().getIp()+"/foret/member/member_board_dislike.do", params, likeChangeResponse);
             } else { //어차피 초반 if문이 처음 좋아요개수가 같지 않을때 였으므로 else를 쓰면 라이크 수가 증가한 경우만 해당
-                client.post("http://34.72.240.24:8085/foret/member/member_board_like.do", params, likeChangeResponse);
+                client.post(getIPAdress.getInstance().getIp()+"/foret/member/member_board_like.do", params, likeChangeResponse);
             }
         }
     }
@@ -411,7 +419,7 @@ public class ReadForetBoardActivity extends AppCompatActivity implements View.On
         builder.setPositiveButton("삭제", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                url = "http://34.72.240.24:8085/foret/board/board_delete.do";
+                url = getIPAdress.getInstance().getIp()+"/foret/board/board_delete.do";
                 RequestParams params = new RequestParams();
                 params.put("id", foretBoardDTO.getId());
                 client.post(url, params, deleteBoardResponse);
@@ -424,7 +432,7 @@ public class ReadForetBoardActivity extends AppCompatActivity implements View.On
     }
 
     private void getMember(int board_id) {
-        url = "http://34.72.240.24:8085/foret/search/member.do";
+        url = getIPAdress.getInstance().getIp()+":8085/foret/search/member.do";
         client = new AsyncHttpClient();
         memberResponse = new MemberResponse();
         RequestParams params = new RequestParams();
@@ -509,7 +517,7 @@ public class ReadForetBoardActivity extends AppCompatActivity implements View.On
                         Log.e("[TEST1]", "작성자 포토  ==== " + object.getString("writer_photo"));
                         foretBoardDTO.setWriter_photo(object.getString("writer_photo"));
                         wirterPhotoGet = object.getString("writer_photo");
-                        String myPhoto = "http://34.72.240.24:8085/foret/storage/" + wirterPhotoGet.toString().replace("[", "").replace("]", "");
+                        String myPhoto = getIPAdress.getInstance().getIp()+"/foret/storage/" + wirterPhotoGet.toString().replace("[", "").replace("]", "");
                         Glide.with(context).load(myPhoto)
                                 .placeholder(R.drawable.icon_defalut).into(image_profile);
                     }

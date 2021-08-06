@@ -58,9 +58,6 @@ public class AppNoticeActivity extends AppCompatActivity {
         list.add(new ModelNotice("관리자 | ","2020-12-06","[안내] 오류 및 버그 안내","버그 및 오류로 인한 불편사항은 관리자에게 문의바랍니다."));
         list.add(new ModelNotice("관리자 | ","2020-12-05","[이벤트] 친구 추천 이벤트","내가 만든 포레에 더 많은 회원을 모집해보세요"));
         list.add(new ModelNotice("관리자 | ","2020-12-01","[공지] 포레1.0 버전 안내","새롭게 런칭한 포레 1.0 버전 안내드립니다."));
-
-
-
     }
 
     @Override //메뉴 이벤트 처리
