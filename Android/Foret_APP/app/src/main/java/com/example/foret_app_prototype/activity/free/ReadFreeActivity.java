@@ -37,6 +37,7 @@ import com.example.foret_app_prototype.activity.notify.Response;
 import com.example.foret_app_prototype.activity.notify.Sender;
 import com.example.foret_app_prototype.activity.notify.Token;
 import com.example.foret_app_prototype.adapter.free.CommentListFreeBoardAdapter;
+import com.example.foret_app_prototype.helper.getIPAdress;
 import com.example.foret_app_prototype.model.ForetBoard;
 import com.example.foret_app_prototype.model.ForetBoardComment;
 import com.example.foret_app_prototype.model.ModelUser;
@@ -204,7 +205,7 @@ public class ReadFreeActivity extends AppCompatActivity
         RequestParams params = new RequestParams();
         params.put("id", foretBoard.getId());
         params.put("type", 0);
-        client.post("http://34.72.240.24:8085/foret/search/boardSelect.do", params, viewResponse);
+        client.post(getIPAdress.getInstance().getIp()+"/foret/search/boardSelect.do", params, viewResponse);
     }
 
     @Override
@@ -242,7 +243,7 @@ public class ReadFreeActivity extends AppCompatActivity
             public void onClick(DialogInterface dialog, int which) {
                 RequestParams params = new RequestParams();
                 params.put("id", foretBoard.getId());
-                client.post("http://34.72.240.24:8085/foret/board/board_delete.do", params, deleteBoardResponse);
+                client.post(getIPAdress.getInstance().getIp()+"/foret/board/board_delete.do", params, deleteBoardResponse);
             }
         });
         builder.setNegativeButton("취소", null);
@@ -291,7 +292,7 @@ public class ReadFreeActivity extends AppCompatActivity
             params.put("board_id", foretBoard.getId());
             params.put("writer", memberID);
             params.put("content", editText_comment.getText().toString().trim());
-            client.post("http://34.72.240.24:8085/foret/comment/comment_insert.do", params, writeCommentResponse);
+            client.post(getIPAdress.getInstance().getIp()+"/foret/comment/comment_insert.do", params, writeCommentResponse);
         } else {
             // 대댓
             Log.d("[TEST]", "inputComment: 대댓 전송");
@@ -300,7 +301,7 @@ public class ReadFreeActivity extends AppCompatActivity
             params.put("writer", memberID);
             params.put("comment_id", group_no);
             params.put("content", editText_comment.getText().toString().trim());
-            client.post("http://34.72.240.24:8085/foret/comment/recomment_insert.do", params, writeReCommentResponse);
+            client.post(getIPAdress.getInstance().getIp()+"/foret/comment/recomment_insert.do", params, writeReCommentResponse);
             replying = false;
         }
         // 새로운 게시물 여부 알림
@@ -369,10 +370,10 @@ public class ReadFreeActivity extends AppCompatActivity
             //updateuserActiveStatusOff(); // 오프라인 상태 만들기
 
             if (initial_likecount > like_count) { // 좋아요 수가 1감소함->좋아요 삭제
-                client.post("http://34.72.240.24:8085/foret/member/member_board_dislike.do", params,
+                client.post(getIPAdress.getInstance().getIp()+"/foret/member/member_board_dislike.do", params,
                         likeChangeResponse);
             } else { // 어차피 초반 if문이 처음 좋아요개수가 같지 않을때 였으므로 else를 쓰면 라이크 수가 증가한 경우만 해당
-                client.post("http://34.72.240.24:8085/foret/member/member_board_like.do", params, likeChangeResponse);
+                client.post(getIPAdress.getInstance().getIp()+"/foret/member/member_board_like.do", params, likeChangeResponse);
             }
         }
     }
@@ -497,7 +498,7 @@ public class ReadFreeActivity extends AppCompatActivity
                         for (DataSnapshot ds : snapshot.getChildren()) {
                             //Log.e("[test]","ds ref?: "+ds.getRef());
                             //Log.e("[test]","ds id??: "+ds.child("id").getValue());
-                            //Log.e("[test]","ds 트루?: "+ds.child("id").getValue().equals(takeReceiver));
+                            Log.e("[test]","ds 트루?: "+ds.child("id").getValue());
                             if (ds.child("id").getValue().toString().equals(takeReceiver)) {
                                 // 받는사람
                                 hisUid = ds.child("uid").getValue() + "";

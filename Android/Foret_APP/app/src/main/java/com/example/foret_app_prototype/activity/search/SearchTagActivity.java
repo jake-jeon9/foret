@@ -14,6 +14,7 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.example.foret_app_prototype.R;
+import com.example.foret_app_prototype.helper.getIPAdress;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
@@ -30,7 +31,7 @@ public class SearchTagActivity extends AppCompatActivity implements View.OnClick
 
     AsyncHttpClient client;
     TagMakeResponse tagMakeResponse;
-    String url = "http://34.72.240.24:8085/foret/tag/tag_insert.do";
+    String url = getIPAdress.getInstance().getIp()+"/foret/tag/tag_insert.do";
 
     String tag_name;
 

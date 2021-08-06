@@ -1,5 +1,7 @@
 package com.example.foret_app_prototype.model;
 
+import com.example.foret_app_prototype.helper.getIPAdress;
+
 import java.io.Serializable;
 
 public class ForetBoard implements Serializable {
@@ -105,7 +107,7 @@ public class ForetBoard implements Serializable {
     }
 
     public String getMember_photo() {
-        return "http://34.72.240.24:8085/foret/storage/"+member_photo;
+        return getIPAdress.getInstance().getIp()+"/foret/storage/"+member_photo;
     }
 
     public void setMember_photo(String member_photo) {

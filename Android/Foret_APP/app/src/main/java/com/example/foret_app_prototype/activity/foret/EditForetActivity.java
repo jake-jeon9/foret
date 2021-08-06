@@ -31,8 +31,10 @@ import com.example.foret_app_prototype.activity.login.GuideActivity;
 import com.example.foret_app_prototype.activity.menu.EditMyInfoActivity;
 import com.example.foret_app_prototype.helper.FileUtils;
 import com.example.foret_app_prototype.helper.PhotoHelper;
+import com.example.foret_app_prototype.helper.getIPAdress;
 import com.example.foret_app_prototype.model.Foret;
-import com.example.foret_app_prototype.model.Member;
+import com.example.foret_app_prototype.model.ForetViewDTO;
+import com.example.foret_app_prototype.model.MemberDTO;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
@@ -42,6 +44,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -49,12 +52,13 @@ import java.util.List;
 import cz.msebera.android.httpclient.Header;
 
 public class EditForetActivity extends AppCompatActivity implements View.OnClickListener {
-    Member member;
-    Foret foret;
+    MemberDTO member;
+    ForetViewDTO foret;
+    String leader;
 
     AsyncHttpClient client;
     EditForetResponse editForetResponse;
-    String url = "";
+    String url = getIPAdress.getInstance().getIp()+"/foret/foret/foret_modify.do";
 
     ImageView profile, button_close, button_tag_edit, button_region_edit, button_member_edit;
     Button button_complete;
@@ -87,7 +91,7 @@ public class EditForetActivity extends AppCompatActivity implements View.OnClick
     List<String> foret_tag;
 
     TagListResponse tagListResponse;
-
+    Uri uri;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -100,10 +104,13 @@ public class EditForetActivity extends AppCompatActivity implements View.OnClick
         window.setStatusBarColor(ContextCompat.getColor(this, R.color.foret4));
 
         getFindId();
-        foret = (Foret) getIntent().getSerializableExtra("foret");
-
+        foret = (ForetViewDTO) getIntent().getSerializableExtra("foret");
+        member = (MemberDTO) getIntent().getSerializableExtra("memberDTO");
+        leader = getIntent().getStringExtra("leader");
+        tagListResponse = new TagListResponse();
+        client = new AsyncHttpClient();
         dataSetting();
-
+        client.post(getIPAdress.getInstance().getIp()+"/foret/tag/tag_list.do", tagListResponse);
     }
 
     private void getFindId() {
@@ -121,12 +128,15 @@ public class EditForetActivity extends AppCompatActivity implements View.OnClick
         button_complete = findViewById(R.id.button_complete);
         button_member_edit = findViewById(R.id.button_member_edit);
         editText_intro = findViewById(R.id.editText_intro);
-        tagListResponse = new TagListResponse();
+
         region_si = new ArrayList<>();
         region_gu = new ArrayList<>();
         foret_tag = new ArrayList<>();
         member_tag = new ArrayList<>();
         tag_name = new ArrayList<>();
+        tag_list = new ArrayList<>();
+        selected_tag = new ArrayList<>();
+        str_check = new ArrayList<>();
 
         textView1.setOnClickListener(this);
         button_close.setOnClickListener(this);
@@ -137,15 +147,26 @@ public class EditForetActivity extends AppCompatActivity implements View.OnClick
     }
 
     private void dataSetting() {
-//        Glide.with(this).load(foret.getForet_photo()).into(profile);
-        profile.setImageResource(foret.getForetImage());
+        Glide.with(this).load(foret.getPhoto()).
+                placeholder(R.drawable.sss).
+                error(R.drawable.sss).
+                into(profile);
+
+        String tag = "";
+        for(int i = 0 ; i<foret.getForet_tag().size();i++){
+            tag+=("#"+foret.getForet_tag().get(i)+" ");
+        }
+
+        //profile.setImageResource(foret.getForetImage());
         textView_name.setText(foret.getName());
-        textView_tag.setText(Arrays.toString(foret.getForet_tag()));
-        textView_region.setText(Arrays.toString(foret.getForet_region()));
-        textView_member.setText(foret.getMember().length + "/" + foret.getMax_member());
-        textView_master.setText("포레 리더 : " + foret.getLeader());
+        textView_tag.setText(tag);
+        textView_region.setText(foret.getForet_region_si()+" "+foret.getForet_region_gu());
+        textView_member.setText(foret.getMember().size() + "/" + foret.getMax_member());
+        textView_master.setText("포레 리더 : " + leader);
         textView_birth.setText(foret.getReg_date());
         editText_intro.setText(foret.getIntroduce());
+        max_member_count = foret.getMax_member();
+
     }
 
     @Override
@@ -182,33 +203,61 @@ public class EditForetActivity extends AppCompatActivity implements View.OnClick
             Toast.makeText(this, "포레 소개를 입력하세요.", Toast.LENGTH_SHORT).show();
             return;
         }
-
-        String[] str_si = new String[region_si.size()];
-        String[] str_gu = new String[region_gu.size()];
-        for(int a=0; a<str_si.length; a++) {
-            str_si[a] = region_si.get(a);
-            str_gu[a] = region_gu.get(a);
-        }
-
-        String[] str_tag = new String[foret_tag.size()];
-        for(int a=0; a<str_tag.length; a++) {
-            str_tag[a] = foret_tag.get(a);
-        }
-
-        client = new AsyncHttpClient();
         editForetResponse = new EditForetResponse();
         RequestParams params = new RequestParams();
+
+        if(region_si.size()>0 && region_gu.size()>0){
+            String[] str_si = new String[region_si.size()];
+            String[] str_gu = new String[region_gu.size()];
+        for (int a = 0; a < str_si.length; a++) {
+            str_si[a] = region_si.get(a);
+            str_gu[a] = region_gu.get(a);
+            if (a == 0) {
+                params.put("region_si", str_si[a]);
+                params.put("region_gu", str_gu[a]);
+                Log.e("[test]", "리전?" + str_si[a] + "," + str_gu[a]);
+            } else {
+                params.add("region_si", str_si[a]);
+                params.add("region_gu", str_gu[a]);
+                Log.e("[test]", "리전?" + str_si[a] + "," + str_gu[a]);
+            }
+
+        }
+
+        }
+        if(str_check.size()>0 ){
+            String[] str_tag = new String[str_check.size()];
+            for (int a = 0; a < str_tag.length; a++) {
+                str_tag[a] = str_check.get(a);
+                if (a == 0) {
+                    params.put("tag", str_tag[a]);
+                    Log.e("[test]", "태그??" + str_tag[a]);
+                } else {
+                    params.add("tag", str_tag[a]);
+                    Log.e("[test]", "태그??" + str_tag[a]);
+                }
+            }
+        }
+
+
+
 
         params.put("leader_id", member.getId());
         params.put("name", edit_name);
         params.put("introduce", edit_intro);
         params.put("max_member", max_member_count);
-        params.put("tag", str_tag);
-        params.put("region_si", str_si);
-        params.put("region_gu", str_gu);
-        if(file != null) {
-            params.put("photo", filePath);
+
+
+
+        try {
+            if (file != null) {
+                params.put("photo", file);
+                Log.d("----------------]",file.getPath());
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
         }
+
         params.put("id", foret.getId());
         client.post(url, params, editForetResponse);
     }
@@ -273,11 +322,13 @@ public class EditForetActivity extends AppCompatActivity implements View.OnClick
                     Glide.with(this).load(filePath).into(profile);
                     break;
                 case 300 :
-                    String uri = data.getData().toString();
-                    String fileName = uri.substring(uri.lastIndexOf("/")+1);
+                    String uri1 = data.getData().toString();
+                    uri = data.getData();
+                    String fileName = uri1.substring(uri1.lastIndexOf("/") + 1);
                     Log.d("[TEST]", "fileName = " + fileName);
-                    filePath= FileUtils.getPath(this, data.getData());
+                    filePath = FileUtils.getPath(this, data.getData());
                     Log.d("[TEST]", "filePath = " + filePath);
+                    file = new File(filePath);
                     Toast.makeText(this, fileName + "을 선택하셨습니다.", Toast.LENGTH_SHORT).show();
                     Glide.with(this).load(filePath).into(profile);
             }
@@ -317,14 +368,14 @@ public class EditForetActivity extends AppCompatActivity implements View.OnClick
         spinner_max_member.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                Log.d("[TEST]", "foret.getMember().length => " + foret.getMember().length);
-                if(foret.getMember().length < (position+1)) {
+                Log.d("[TEST]", "foret.getMember().length => " + foret.getMember().size());
+                if(foret.getMember().size() < (position+1)) {
                     max_member_count = position+1;
                     Log.d("[TEST]", "max_member_count => " + max_member_count);
                 } else {
                     spinner_max_member.setSelection((foret.getMax_member()-1));
                     selected_view.setText("현재 소속된 인원수보다 작습니다.\n" +
-                            "현재 소속된 인원수 : " + foret.getMember().length);
+                            "현재 소속된 인원수 : " + foret.getMember().size());
                 }
             }
 
@@ -338,7 +389,7 @@ public class EditForetActivity extends AppCompatActivity implements View.OnClick
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 //확인 버튼 누르면
-                textView_member.setText(foret.getMember().length + "/" + max_member_count);
+                textView_member.setText(foret.getMember().size() + "/" + max_member_count);
             }
         });
         builder.setNegativeButton("취소", null);
@@ -540,6 +591,8 @@ public class EditForetActivity extends AppCompatActivity implements View.OnClick
                         show += region_si.get(a) + " " + region_gu.get(a) + "\n";
                         Log.d("[TEST]", "region_si.get(a) => " + region_si.get(a));
                         Log.d("[TEST]", "region_gu.get(a) => " + region_gu.get(a));
+
+
                     }
                     textView_region.setText(show);
                     textView_region.setVisibility(View.VISIBLE);
@@ -566,8 +619,7 @@ public class EditForetActivity extends AppCompatActivity implements View.OnClick
         str = "";
         show = "";
         ischecked = false;
-        selected_tag = new ArrayList<>();
-        str_check = new ArrayList<>();
+
 
         Spinner spinner_tag = region_view.findViewById(R.id.spinner_tag);
         TextView selected_view = region_view.findViewById(R.id.selected_view);
@@ -641,7 +693,7 @@ public class EditForetActivity extends AppCompatActivity implements View.OnClick
             String str = new String(responseBody);
             try {
                 JSONObject json = new JSONObject(str);
-                String rt = json.getString("rt");
+                String rt = json.getString("foretRT");
                 if(rt.equals("OK")) {
                     modifyCheck();
                 } else {

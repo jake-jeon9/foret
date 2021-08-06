@@ -29,6 +29,7 @@ import androidx.core.content.ContextCompat;
 import com.example.foret_app_prototype.R;
 import com.example.foret_app_prototype.helper.CalendarHelper;
 import com.example.foret_app_prototype.helper.ProgressDialogHelper;
+import com.example.foret_app_prototype.helper.getIPAdress;
 import com.example.foret_app_prototype.model.Member;
 import com.example.foret_app_prototype.model.MemberDTO;
 import com.example.foret_app_prototype.model.ModelUser;
@@ -302,7 +303,7 @@ public class JoinUsActivity extends AppCompatActivity implements View.OnClickLis
 
     private void checkedEmail() {
         email = editText4.getText().toString().trim();
-        String url = "http://34.72.240.24:8085/foret/search/check_email.do";
+        String url = getIPAdress.getInstance().getIp()+"/foret/search/check_email.do";
         AsyncHttpClient client = new AsyncHttpClient();
         EmailResponse emailResponse = new EmailResponse();
         RequestParams params = new RequestParams();
@@ -603,6 +604,7 @@ public class JoinUsActivity extends AppCompatActivity implements View.OnClickLis
         public void onFinish() {
             super.onFinish();
             Log.e("[TEST]","EmailResponse onFinish() 호출");
+            Log.e("[TEST]","my ip?" + getIPAdress.getInstance().getIp());
             if (check_email.equals("OK")) {
                 textView4.setText("사용 가능한 이메일입니다.");
                 textView4.setTextColor(Color.parseColor("#FF0000FF"));

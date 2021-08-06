@@ -17,6 +17,7 @@ import androidx.core.content.ContextCompat;
 
 import com.example.foret_app_prototype.R;
 import com.example.foret_app_prototype.activity.login.SessionManager;
+import com.example.foret_app_prototype.helper.getIPAdress;
 import com.example.foret_app_prototype.model.ForetBoard;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
@@ -61,7 +62,7 @@ public class EditFreeActivity extends AppCompatActivity {
 
         editText_subject.setText(foretBoard.getSubject());
         editText_content.setText(foretBoard.getContent());
-        textView_writer.setText("작성자 : "+foretBoard.getId());
+        textView_writer.setText("작성자 : "+foretBoard.getWriter());
 
         SessionManager sessionManager = new SessionManager(this);
         id = sessionManager.getSession();
@@ -98,7 +99,7 @@ public class EditFreeActivity extends AppCompatActivity {
                 params.put("subject", editText_subject.getText().toString().trim());
                 params.put("content", editText_content.getText().toString().trim());
                 params.setForceMultipartEntityContentType(true);
-                client.post("http://34.72.240.24:8085/foret/board/board_modify.do", params, response);
+                client.post(getIPAdress.getInstance().getIp()+"/foret/board/board_modify.do", params, response);
                 break;
         }
         return super.onOptionsItemSelected(item);

@@ -41,6 +41,7 @@ import com.example.foret_app_prototype.helper.CalendarHelper;
 import com.example.foret_app_prototype.helper.FileUtils;
 import com.example.foret_app_prototype.helper.PhotoHelper;
 import com.example.foret_app_prototype.helper.ProgressDialogHelper;
+import com.example.foret_app_prototype.helper.getIPAdress;
 import com.example.foret_app_prototype.model.Foret;
 import com.example.foret_app_prototype.model.Member;
 import com.example.foret_app_prototype.model.MemberDTO;
@@ -81,7 +82,7 @@ public class MakeForetActivity extends AppCompatActivity implements View.OnClick
 
     AsyncHttpClient client;
     ForetResponse foretResponse;
-    String url = "http://34.72.240.24:8085/foret/foret/foret_insert.do";
+    String url = getIPAdress.getInstance().getIp()+"/foret/foret/foret_insert.do";
     //String url = "http://192.168.0.180:8085/foret/foret/foret_insert.do";
     ImageView image_View_picture, button_cancel;
     EditText editText_name, editText_member, editText_intro;
@@ -184,7 +185,7 @@ public class MakeForetActivity extends AppCompatActivity implements View.OnClick
 
         //각 지역, 태그 리스트에 DB에 저장된 목록 저장
         //client.post("http://34.72.240.24:8085/foret/region/region_list.do", regionListResponse);
-        client.post("http://34.72.240.24:8085/foret/tag/tag_list.do", tagListResponse);
+        client.post(getIPAdress.getInstance().getIp()+"/foret/tag/tag_list.do", tagListResponse);
 
     }
 

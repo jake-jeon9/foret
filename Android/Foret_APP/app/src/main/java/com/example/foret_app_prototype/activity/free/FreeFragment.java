@@ -31,6 +31,7 @@ import com.example.foret_app_prototype.activity.MainActivity;
 import com.example.foret_app_prototype.activity.login.SessionManager;
 import com.example.foret_app_prototype.adapter.free.ListFreeBoardAdapter;
 import com.example.foret_app_prototype.helper.ProgressDialogHelper;
+import com.example.foret_app_prototype.helper.getIPAdress;
 import com.example.foret_app_prototype.model.ForetBoard;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.gson.Gson;
@@ -132,7 +133,7 @@ public class FreeFragment extends Fragment implements View.OnClickListener {
         params.put("pg", 1);
         params.put("size", 10);
 
-        client.post("http://34.72.240.24:8085/foret/search/boardList.do", params, response1);
+        client.post(getIPAdress.getInstance().getIp()+"/foret/search/boardList.do", params, response1);
         ProgressDialogHelper.getInstance().getProgressbar(getContext(),"잠시만 기다려주세요.");
     }
 
@@ -171,7 +172,7 @@ public class FreeFragment extends Fragment implements View.OnClickListener {
                 button3.setTypeface(null);
                 button3.setTextColor(Color.GRAY);
                 params.put("inquiry_type", 1);
-                client.post("http://34.72.240.24:8085/foret/search/boardList.do", params, response1);
+                client.post(getIPAdress.getInstance().getIp()+"/foret/search/boardList.do", params, response1);
                 ProgressDialogHelper.getInstance().getProgressbar(getContext(),"잠시만 기다려주세요.");
                 break;
             case R.id.button2 : //댓글순
@@ -182,7 +183,7 @@ public class FreeFragment extends Fragment implements View.OnClickListener {
                 button3.setTypeface(null);
                 button3.setTextColor(Color.GRAY);
                 params.put("inquiry_type", 4);
-                client.post("http://34.72.240.24:8085/foret/search/boardList.do", params, response1);
+                client.post(getIPAdress.getInstance().getIp()+"/foret/search/boardList.do", params, response1);
                 ProgressDialogHelper.getInstance().getProgressbar(getContext(),"잠시만 기다려주세요.");
                 break;
             case R.id.button3 : //추천순
@@ -193,7 +194,7 @@ public class FreeFragment extends Fragment implements View.OnClickListener {
                 button1.setTypeface(null);
                 button1.setTextColor(Color.GRAY);
                 params.put("inquiry_type", 3);
-                client.post("http://34.72.240.24:8085/foret/search/boardList.do", params, response1);
+                client.post(getIPAdress.getInstance().getIp()+"/foret/search/boardList.do", params, response1);
                 ProgressDialogHelper.getInstance().getProgressbar(getContext(),"잠시만 기다려주세요.");
                 break;
             case R.id.button4 :
@@ -277,7 +278,7 @@ public class FreeFragment extends Fragment implements View.OnClickListener {
                     client.setResponseTimeout(DEFAULT_TIME);
                     client.setTimeout(DEFAULT_TIME);
                     client.setResponseTimeout(DEFAULT_TIME);
-                    client.post("http://34.72.240.24:8085/foret/search/member.do", params, response2);
+                    client.post(getIPAdress.getInstance().getIp()+"/foret/search/member.do", params, response2);
                 }
             } catch (JSONException e) {
                 ProgressDialogHelper.getInstance().removeProgressbar();

@@ -1,5 +1,7 @@
 package com.example.foret_app_prototype.model;
 
+import com.example.foret_app_prototype.helper.getIPAdress;
+
 import java.io.Serializable;
 
 // HomeFragment 사용
@@ -18,7 +20,7 @@ public class HomeForetBoardDTO implements Serializable {
 
     public String getPhoto() {
         if(photo!=null){
-            return  photo = "http://34.72.240.24:8085/foret/storage/"+photo;
+            return  photo = getIPAdress.getInstance().getIp()+"/foret/storage/"+photo;
         }else {
             return photo;
         }

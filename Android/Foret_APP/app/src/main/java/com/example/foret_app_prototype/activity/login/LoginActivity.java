@@ -21,6 +21,7 @@ import com.example.foret_app_prototype.R;
 import com.example.foret_app_prototype.activity.MainActivity;
 import com.example.foret_app_prototype.activity.notify.Token;
 import com.example.foret_app_prototype.helper.ProgressDialogHelper;
+import com.example.foret_app_prototype.helper.getIPAdress;
 import com.example.foret_app_prototype.model.MemberDTO;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -54,7 +55,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     String id;
     AsyncHttpClient client;
     HttpResponse response;
-    String url = "http://34.72.240.24:8085/foret/search/member_login.do";
+    String url = getIPAdress.getInstance().getIp()+"/foret/search/member_login.do";
     Button button0;
     TextView button3, button4;
     EditText emailEditText, passwordEditText;

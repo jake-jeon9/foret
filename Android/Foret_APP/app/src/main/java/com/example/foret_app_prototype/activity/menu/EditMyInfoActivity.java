@@ -38,6 +38,7 @@ import com.example.foret_app_prototype.activity.login.GuideActivity;
 import com.example.foret_app_prototype.helper.FileUtils;
 import com.example.foret_app_prototype.helper.PhotoHelper;
 import com.example.foret_app_prototype.helper.ProgressDialogHelper;
+import com.example.foret_app_prototype.helper.getIPAdress;
 import com.example.foret_app_prototype.model.MemberDTO;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
@@ -130,7 +131,7 @@ public class EditMyInfoActivity extends AppCompatActivity implements View.OnClic
 
         //각 지역, 태그 리스트에 DB에 저장된 목록 저장
         //client.post("http://34.72.240.24:8085/foret/region/region_list.do", regionListResponse);
-        client.post("http://34.72.240.24:8085/foret/tag/tag_list.do", tagListResponse);
+        client.post(getIPAdress.getInstance().getIp()+"/foret/tag/tag_list.do", tagListResponse);
 
         dataSetting();
 
@@ -148,9 +149,14 @@ public class EditMyInfoActivity extends AppCompatActivity implements View.OnClic
 
             @Override
             public void afterTextChanged(Editable s) {
+
                 if (editText2.getText().toString().trim().equals(editText3.getText().toString().trim())) {
                     textView_confirm.setTextColor(Color.BLUE);
                     textView_confirm.setText("비밀번호가 일치합니다.");
+                }else{
+                    textView_confirm.setVisibility(View.VISIBLE);
+                    textView_confirm.setTextColor(Color.RED);
+                    textView_confirm.setText("비밀번호가 비일치합니다.");
                 }
             }
         });
@@ -165,7 +171,7 @@ public class EditMyInfoActivity extends AppCompatActivity implements View.OnClic
         button1.setText(getIntent().getStringExtra("region"));
         button2.setText(getIntent().getStringExtra("tag"));
         Glide.with(this).load(memberDTO.getPhoto()).
-                fallback(R.drawable.icon2)
+                fallback(R.drawable.icon2).error(R.drawable.icon2).placeholder(R.drawable.icon2)
                 .into(profile);
     }
 
@@ -627,7 +633,9 @@ public class EditMyInfoActivity extends AppCompatActivity implements View.OnClic
         params.put("nickname", memberDTO.getNickname());
         params.put("password", memberDTO.getPassword());
         params.put("id", memberDTO.getId());
+
         if (filePath != null) {
+            Log.d("tag","-----[][]filePath :"+filePath.toString()+"[][]---------------");
             try {
                 params.put("photo", new File(filePath));
             } catch (FileNotFoundException e) {
@@ -643,7 +651,7 @@ public class EditMyInfoActivity extends AppCompatActivity implements View.OnClic
         client.setResponseTimeout(DEFAULT_TIME);
 
         ProgressDialogHelper.getInstance().getProgressbar(this, "정보 수정 진행중.");
-        client.post("http://34.72.240.24:8085/foret/member/member_modify.do", params, response);
+        client.post(getIPAdress.getInstance().getIp()+"/foret/member/member_modify.do", params, response);
     }
 
     class MyInfoEditResponse extends AsyncHttpResponseHandler {
@@ -654,9 +662,15 @@ public class EditMyInfoActivity extends AppCompatActivity implements View.OnClic
             try {
                 ProgressDialogHelper.getInstance().removeProgressbar();
                 JSONObject json = new JSONObject(str_json);
-                if (json.getString("memberRT").equals("OK") && json.getString("memberRegionRT").equals("OK")
-                        && json.getString("memberTagRT").equals("OK")) {
-                    Toast.makeText(EditMyInfoActivity.this, "내 정보 수정이 완료 되었습니다.", Toast.LENGTH_SHORT).show();
+                String line = "";
+
+                if (json.getString("rt").equals("OK")) {
+                    if(json.getString("memberRT").equals("OK")) line +="[개인정보]";
+                    if(json.getString("memberRegionRT").equals("OK")) line+="[지역정보]";
+                    if(json.getString("memberTagRT").equals("OK")) line+="[태그정보]";
+                    if(json.getString("memberPhotoRT").equals("OK")) line+="[사진 정보]";
+
+                    Toast.makeText(EditMyInfoActivity.this, line+"가 수정이 완료 되었습니다.", Toast.LENGTH_SHORT).show();
                     Intent intent = new Intent();
                     intent.putExtra("memberDTO", memberDTO);
                     setResult(RESULT_OK, intent);

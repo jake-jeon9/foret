@@ -45,6 +45,7 @@ import com.example.foret_app_prototype.activity.notify.Token;
 import com.example.foret_app_prototype.helper.FileUtils;
 import com.example.foret_app_prototype.helper.PhotoHelper;
 import com.example.foret_app_prototype.helper.ProgressDialogHelper;
+import com.example.foret_app_prototype.helper.getIPAdress;
 import com.example.foret_app_prototype.model.MemberDTO;
 import com.example.foret_app_prototype.model.ModelUser;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -99,6 +100,7 @@ public class WriteForetBoardActivity extends AppCompatActivity implements View.O
     // 보낼 데이터
     String[] str_boardImage = new String[5];
     File[] file = new File[5];
+    ArrayList<File> fileList = new ArrayList<>();
     int type = 0;
     String subject = "";
     String content = "";
@@ -209,7 +211,7 @@ public class WriteForetBoardActivity extends AppCompatActivity implements View.O
     }
 
     private void putParams() {
-        url = "http://34.72.240.24:8085/foret/board/board_insert.do";
+        url = getIPAdress.getInstance().getIp()+"/foret/board/board_insert.do";
         client = new AsyncHttpClient();
         writeBoardResponse = new WriteBoardResponse();
         RequestParams params = new RequestParams();
@@ -226,30 +228,20 @@ public class WriteForetBoardActivity extends AppCompatActivity implements View.O
         Log.e("[test]--포레 글쓰기", "type" + type);
         Log.e("[test]--포레 글쓰기", "content" + content);
         Log.e("[test]--포레 글쓰기", "subject" + subject);
-
+        Log.e("[test]--포레 글쓰기", "image_count??" + image_count);
+        Log.e("[test]--포레 글쓰기", "file size????" + file.length);
         try {
-            switch (image_count) {
-                case 5:
-                    params.put("photo", file[4]);
-                case 4:
-                    params.put("photo", file[3]);
-                case 3:
-                    params.put("photo", file[2]);
-                case 2:
-                    params.put("photo", file[1]);
-                case 1:
-                    params.put("photo", file[0]);
-                    break;
+            for(int i = 0; i<image_count;i++){
+                Log.e("[test]--포레 글쓰기", "file???" + file[i].getName());
+                params.put("photo",file[i]);
+            }
+            //params.put("photo",file);
+
+            }catch (Exception e){
+                e.getMessage();
             }
 
-
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-
-
         for (int a = 1; a <= image_count; a++) {
-
             Log.d("[TEST]", "포토 테스트 => " + str_boardImage[a]);
         }
         //client.setURLEncodingEnabled(false);
@@ -309,29 +301,11 @@ public class WriteForetBoardActivity extends AppCompatActivity implements View.O
                 showSelect();
                 break;
             case R.id.imageView0:
-                if (image_count == 0) {
-                    deleteImage();
-                }
-                break;
             case R.id.imageView1:
-                if (image_count == 1) {
-                    deleteImage();
-                }
-                break;
             case R.id.imageView2:
-                if (image_count == 2) {
-                    deleteImage();
-                }
-                break;
             case R.id.imageView3:
-                if (image_count == 3) {
-                    deleteImage();
-                }
-                break;
             case R.id.imageView4:
-                if (image_count == 4) {
                     deleteImage();
-                }
                 break;
         }
     }
@@ -426,7 +400,8 @@ public class WriteForetBoardActivity extends AppCompatActivity implements View.O
                     String fileName = uri.substring(uri.lastIndexOf("/") + 1);
                     Log.d("[TEST]", "fileName = " + fileName);
                     filePath = FileUtils.getPath(this, data.getData());
-                    file[image_count + 1] = new File(filePath);
+                    //fileList.add(new File(filePath));
+                    file[image_count++] = new File(filePath);
                     Log.d("[TEST]", "filePath = " + filePath);
                     Toast.makeText(this, fileName + "을 선택하셨습니다.", Toast.LENGTH_SHORT).show();
                     insertImage();
@@ -435,23 +410,23 @@ public class WriteForetBoardActivity extends AppCompatActivity implements View.O
     }
 
     private void insertImage() {
-        if (image_count == 0) {
+        if (image_count == 1) {
             str_boardImage[0] = filePath;
             Glide.with(this).load(filePath).into(imageView0);
             image_count = 1;
-        } else if (image_count == 1) {
+        } else if (image_count == 2) {
             str_boardImage[1] = filePath;
             Glide.with(this).load(filePath).into(imageView1);
             image_count = 2;
-        } else if (image_count == 2) {
+        } else if (image_count == 3) {
             str_boardImage[2] = filePath;
             Glide.with(this).load(filePath).into(imageView2);
             image_count = 3;
-        } else if (image_count == 3) {
+        } else if (image_count == 4) {
             str_boardImage[3] = filePath;
             Glide.with(this).load(filePath).into(imageView3);
             image_count = 4;
-        } else if (image_count == 4) {
+        } else if (image_count == 5) {
             str_boardImage[4] = filePath;
             Glide.with(this).load(filePath).into(imageView4);
             image_count = 5;
@@ -461,25 +436,30 @@ public class WriteForetBoardActivity extends AppCompatActivity implements View.O
 
     private void deleteImage() {
         if (image_count == 5) {
-            str_boardImage[4] = "";
+            image_count --;
+            str_boardImage[image_count] = "";
             imageView4.setImageResource(R.drawable.picture);
-            image_count = 4;
+            file[image_count] = null;
         } else if (image_count == 4) {
-            str_boardImage[3] = "";
+            image_count --;
+            str_boardImage[image_count] = "";
             imageView3.setImageResource(R.drawable.picture);
-            image_count = 3;
+            file[image_count] = null;
         } else if (image_count == 3) {
-            str_boardImage[2] = "";
+            image_count --;
+            str_boardImage[image_count] = "";
             imageView2.setImageResource(R.drawable.picture);
-            image_count = 2;
+            file[image_count] = null;
         } else if (image_count == 2) {
-            str_boardImage[1] = "";
+            image_count --;
+            str_boardImage[image_count] = "";
             imageView1.setImageResource(R.drawable.picture);
-            image_count = 1;
+            file[image_count] = null;
         } else if (image_count == 1) {
-            str_boardImage[0] = "";
+            image_count --;
+            str_boardImage[image_count] = "";
             imageView0.setImageResource(R.drawable.picture);
-            image_count = 0;
+            file[image_count] = null;
         }
         Log.d("[TEST]", "str_boardImage.length() => " + str_boardImage.length);
     }
@@ -492,7 +472,7 @@ public class WriteForetBoardActivity extends AppCompatActivity implements View.O
                 JSONObject json = new JSONObject(str);
                 String boardRT = json.getString("boardRT");
                 String boardPhotoRT = json.getString("boardPhotoRT");
-                Toast.makeText(context, "boardPhotoRT?" + boardPhotoRT + "\n 리절트? " + boardRT, Toast.LENGTH_LONG).show();
+                //Toast.makeText(context, "boardPhotoRT?" + boardPhotoRT + "\n 리절트? " + boardRT, Toast.LENGTH_LONG).show();
                 if (boardRT.equals("OK")) {
 
                     Toast.makeText(context, "등록 성공!", Toast.LENGTH_LONG).show();
@@ -545,7 +525,7 @@ public class WriteForetBoardActivity extends AppCompatActivity implements View.O
                             ProgressDialogHelper.getInstance().removeProgressbar();
                         }
                     });
-
+                    finish();
 
                 } else {
                     Toast.makeText(WriteForetBoardActivity.this, "등록하지 못했습니다.", Toast.LENGTH_SHORT).show();

@@ -1,5 +1,7 @@
 package com.example.foret_app_prototype.model;
 
+import com.example.foret_app_prototype.helper.getIPAdress;
+
 import java.io.Serializable;
 import java.util.List;
 
@@ -64,7 +66,7 @@ public class ReadForetDTO implements Serializable {
     }
 
     public String getWriter_photo() {
-        return "http://34.72.240.24:8085/foret/storage/"+writer_photo;
+        return getIPAdress.getInstance().getIp()+"/foret/storage/"+writer_photo;
     }
 
     public void setWriter_photo(String writer_photo) {
