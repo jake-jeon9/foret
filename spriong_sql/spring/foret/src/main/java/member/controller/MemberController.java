@@ -88,6 +88,9 @@ public class MemberController {
 	    }
 	    
 	    JSONObject json = new JSONObject();
+	    String value = "FAIL";
+	    if(memberRT.equals("OK")||memberTagRT.equals("OK")||memberRegionRT.equals("OK")||memberPhotoRT.equals("OK")) value="OK";
+	    json.put("rt", value);
 	    json.put("memberRT", memberRT);
 	    json.put("memberTagRT", memberTagRT);
 	    json.put("memberRegionRT", memberRegionRT);
@@ -252,10 +255,12 @@ public class MemberController {
 		System.out.println("함수 실행 : modifyMemberTag");
 		int member_id = haveId(request.getParameter("id"));
 		String tag[] = request.getParameterValues("tag");
+		
 		int result = 0;
 		// 삭제 여부 알 수 없음
-		memberTagDelete(member_id);
+		
 		if(tag != null) {
+			memberTagDelete(member_id);
 			result = memberTagWrite(member_id, getTagId(tag));
 	    }
 		System.out.println("함수 종료 : modifyMemberTag");
@@ -268,8 +273,9 @@ public class MemberController {
 	    String region_gu[] = request.getParameterValues("region_gu");
 	    int result = 0;
 		// 삭제 여부 알 수 없음
-	    memberRegionDelete(member_id);
+	    
 	    if(region_si != null && region_gu != null) {
+	    	memberRegionDelete(member_id);
 	    	result = memberRegionWrite(member_id, getRegionId(region_si, region_gu));
 	    }
 		System.out.println("함수 종료 : modifyMemberRegion");
@@ -280,13 +286,10 @@ public class MemberController {
 		int member_id = haveId(request.getParameter("id"));
 		int result = 0;
 		if(photo != null) {
-			// 사진 수정
+			// 사진 삭제
 			memberPhotoDelete(member_id);
 			result = memberPhotoWrite(member_id, request, photo);
-		} else {
-			// 사진 내리기
-			result = memberPhotoDelete(member_id);
-		}
+		} 
 		System.out.println("함수 종료 : modifyMemberPhoto");
 		return result;
 	}

@@ -3,6 +3,7 @@ package board.controller;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -12,7 +13,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.FileCopyUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
+import org.springframework.web.multipart.support.DefaultMultipartHttpServletRequest;
 import org.springframework.web.servlet.ModelAndView;
 
 import board.bean.BoardDTO;
@@ -27,7 +31,7 @@ public class BoardController {
 	PhotoService photoService;
 	
 	@RequestMapping(value = "/board/board_insert.do")
-	public ModelAndView boardWrite(HttpServletRequest request, MultipartFile[] photo) throws Exception {
+	public ModelAndView boardWrite(HttpServletRequest request,  MultipartFile photo[]) throws Exception {
 		System.out.println("-- 함수 실행 : board_insert.do --");
 		request.setCharacterEncoding("UTF-8");
 		
@@ -51,7 +55,7 @@ public class BoardController {
 		return modelAndView(json);
 	}
 	@RequestMapping(value = "/board/board_modify.do")
-	public ModelAndView boardModify(HttpServletRequest request, MultipartFile[] photo) throws Exception {
+	public ModelAndView boardModify(HttpServletRequest request, MultipartFile photo[]) throws Exception {
 		System.out.println("-- 함수 실행 : board_modify.do --");
 		request.setCharacterEncoding("UTF-8");
 	    
@@ -73,7 +77,7 @@ public class BoardController {
 	}
 
 	@RequestMapping(value = "/board/board_delete.do")
-	public ModelAndView boardDelete(HttpServletRequest request, MultipartFile photo) throws Exception {
+	public ModelAndView boardDelete(HttpServletRequest request, MultipartFile photo[]) throws Exception {
 		System.out.println("-- 함수 실행 : board_delete.do --");
 		request.setCharacterEncoding("UTF-8");
 		String boardRT = "FAIL";
@@ -108,10 +112,11 @@ public class BoardController {
 		System.out.println("함수 종료 : insertBoard");
 		return board_id;
 	}
-	public int insertBoardPhoto(int foret_id, HttpServletRequest request, MultipartFile[] photo) throws Exception {
+	public int insertBoardPhoto(int foret_id, HttpServletRequest request, MultipartFile photo[]) throws Exception {
 		System.out.println("함수 실행 : insertBoardPhoto");
 		int result = 0;
-		if(photo.length > 0) {
+		
+		if(photo != null) {
 			result = boardPhotoWrite(foret_id, request, photo);
 		}
 		System.out.println("함수 종료 : insertBoardPhoto");
@@ -145,13 +150,15 @@ public class BoardController {
 	    System.out.println("함수 종료 : modifyBoard");
 		return result;
 	}
-	public int modifyBoardPhoto(HttpServletRequest request, MultipartFile[] photo) throws Exception {
+	public int modifyBoardPhoto(HttpServletRequest request, MultipartFile photo[]) throws Exception {
 		System.out.println("함수 실행 : modifyBoardPhoto");
 		int foret_id = haveId(request.getParameter("id"));
 		int result = 0;
 		// 삭제 여부 알 수 없음
-		boardPhotoDelete(foret_id);
-		if(photo.length > 0) {
+		int type = haveId(request.getParameter("type"));
+		if (type == 0) return result;
+		if(photo !=null) {
+			boardPhotoDelete(foret_id);
 			result = boardPhotoWrite(foret_id, request, photo);
 		}
 		System.out.println("함수 종료 : modifyBoardPhoto");
@@ -168,20 +175,31 @@ public class BoardController {
 		System.out.println("함수 종료 : deleteBoard");
 		return result;
 	}
-	
-	public int boardPhotoWrite(int foret_id, HttpServletRequest request, MultipartFile[] photos) throws Exception {
+	public int boardPhotoWrite(int foret_id, HttpServletRequest request, MultipartFile photo[]) throws Exception {
 		System.out.println("함수 실행 : boardPhotoWrite");
 		int result = 0;
 		String dir = request.getSession().getServletContext().getRealPath("/storage");
+//		int size = haveId(request.getParameter("count"));
+//		List<MultipartHttpServletRequest> files = new ArrayList<MultipartHttpServletRequest>();
+//		for(int i = 0 ; i<size;i++) {
+//			files.add(((MultipartHttpServletRequest) request)
+//				    .getFiles("fileUpload"));
+//		}
+		List<MultipartFile> files = ((DefaultMultipartHttpServletRequest) request)
+			    .getFiles("photo");
+		
+		
 		List<PhotoDTO> list = new ArrayList<PhotoDTO>();
-		for(MultipartFile photo : photos) {
-			String originname = photo.getOriginalFilename();	
-			String filename = photo.getOriginalFilename();
+		System.out.println("--------------[][]전달??"+files.size());
+		for(MultipartFile Photo : files) {
+			System.out.println("photo?"+Photo.getName());
+			String originname = Photo.getOriginalFilename();	
+			String filename = Photo.getOriginalFilename();
 			int lastIndex = originname.lastIndexOf(".");
 	        String filetype = originname.substring(lastIndex + 1);
-	        int filesize = (int)photo.getSize();
+	        int filesize = (int)Photo.getSize();
 	        File file = new File(dir, filename);
-	        FileCopyUtils.copy(photo.getInputStream(), new FileOutputStream(file));
+	        FileCopyUtils.copy(Photo.getInputStream(), new FileOutputStream(file));
 	        
 	        PhotoDTO photoDTO = new PhotoDTO();
 	        photoDTO.setDir(dir);
@@ -192,10 +210,40 @@ public class BoardController {
 	        photoDTO.setReference_id(foret_id);
 	        list.add(photoDTO);
 		}
-        result = photoService.boardPhotoWrite(list);
+		if(list.size() >0) result = photoService.boardPhotoWrite(list);
         System.out.println("함수 종료 : boardPhotoWrite");
 		return result;
 	}
+//	public int boardPhotoWrite(int foret_id, HttpServletRequest request, MultipartFile[] photos) throws Exception {
+//		System.out.println("함수 실행 : boardPhotoWrite");
+//		int result = 0;
+//		String dir = request.getSession().getServletContext().getRealPath("/storage");
+//		
+//		List<PhotoDTO> list = new ArrayList<PhotoDTO>();
+//		
+//		for(MultipartFile photo : photos) {
+//			String originname = photo.getOriginalFilename();	
+//			String filename = photo.getOriginalFilename();
+//			int lastIndex = originname.lastIndexOf(".");
+//	        String filetype = originname.substring(lastIndex + 1);
+//	        int filesize = (int)photo.getSize();
+//	        File file = new File(dir, filename);
+//	        FileCopyUtils.copy(photo.getInputStream(), new FileOutputStream(file));
+//	        
+//	       
+//	        PhotoDTO photoDTO = new PhotoDTO();
+//	        photoDTO.setDir(dir);
+//	        photoDTO.setOriginname(originname);
+//	        photoDTO.setFilename(filename);
+//	        photoDTO.setFiletype(filetype);
+//	        photoDTO.setFilesize(filesize);
+//	        photoDTO.setReference_id(foret_id);
+//	        list.add(photoDTO);
+//		}
+//		if(list.size() >0)result = photoService.boardPhotoWrite(list);
+//        System.out.println("함수 종료 : boardPhotoWrite");
+//		return result;
+//	}
 	public int boardPhotoDelete(int foret_id) {
 		System.out.println("함수 실행 : boardPhotoDelete");
 		System.out.println("함수 종료 : boardPhotoDelete");

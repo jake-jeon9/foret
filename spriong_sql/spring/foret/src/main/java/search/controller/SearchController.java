@@ -58,7 +58,7 @@ public class SearchController {
 		List<Integer> intlist1 = new ArrayList<Integer>();
 		List<Integer> intlist2 = new ArrayList<Integer>();
 		List<Integer> intlist3 = new ArrayList<Integer>();
-		
+		//System.out.println("--------- size?"+list.size());
 		JSONObject json = new JSONObject();
 		if(list != null) {
 			RT = "OK";
@@ -73,7 +73,6 @@ public class SearchController {
 			temp.put("reg_date", list.get(0).getReg_date());
 			temp.put("deviceToken", list.get(0).getDeviceToken());
 			temp.put("photo", list.get(0).getPhoto());
-			System.out.println(list.get(0).getPhoto());
 			JSONArray tagArray = new JSONArray();
 			JSONArray region_siArray = new JSONArray();
 			JSONArray region_guArray = new JSONArray();
@@ -176,24 +175,26 @@ public class SearchController {
 				foret_id = boardALLDTO.getForet_id();
 				board_id = boardALLDTO.getId();
 				
-				if(tempBoardId != board_id) {
-					if(tempBoardId != 0) {
-						boardArray.put(boardTemp);
-						boardTemp = new JSONObject();
+				if(board_id != 0) {
+					if(tempBoardId != board_id) {
+						if(tempBoardId != 0) {
+							boardArray.put(boardTemp);
+							boardTemp = new JSONObject();
+						}
+						tempBoardId = board_id;
+						boardTemp.put("id", board_id);
+						boardTemp.put("writer", boardALLDTO.getWriter());
+						boardTemp.put("type", boardALLDTO.getType());
+						boardTemp.put("hit", boardALLDTO.getHit());
+						boardTemp.put("subject", boardALLDTO.getSubject());
+						boardTemp.put("content", boardALLDTO.getContent());
+						boardTemp.put("reg_date", boardALLDTO.getReg_date());
+						boardTemp.put("edit_date", boardALLDTO.getEdit_date());
+						boardTemp.put("board_like", boardALLDTO.getBoard_like());
+						boardTemp.put("board_comment", boardALLDTO.getBoard_comment());
+						boardTemp.put("photo", boardALLDTO.getBoard_photo());
 					}
-					tempBoardId = board_id;
-					boardTemp.put("id", board_id);
-					boardTemp.put("writer", boardALLDTO.getWriter());
-					boardTemp.put("type", boardALLDTO.getType());
-					boardTemp.put("hit", boardALLDTO.getHit());
-					boardTemp.put("subject", boardALLDTO.getSubject());
-					boardTemp.put("content", boardALLDTO.getContent());
-					boardTemp.put("reg_date", boardALLDTO.getReg_date());
-					boardTemp.put("edit_date", boardALLDTO.getEdit_date());
-					boardTemp.put("board_like", boardALLDTO.getBoard_like());
-					boardTemp.put("board_comment", boardALLDTO.getBoard_comment());
 				}
-				
 				if(tempForetId != foret_id) {
 					if(tempForetId != 0) {
 						foretTemp.put("board", boardArray);
@@ -205,7 +206,8 @@ public class SearchController {
 					foretTemp.put("id", foret_id);
 					foretTemp.put("name", boardALLDTO.getForet_name());
 					foretTemp.put("photo", boardALLDTO.getForet_photo());
-				}		
+				}	
+				
 			}
 			boardArray.put(boardTemp);
 			foretTemp.put("board", boardArray);
@@ -249,10 +251,10 @@ public class SearchController {
 		map.put("startNum", startNum);
 		List<BoardALLDTO> list;
 		if(pg == 0 && size == 0) {
-			System.out.println("전체 조회");
+			//System.out.println("전체 조회");
 			list = searchService.boardList(map);
 		} else {
-			System.out.println("페이지 조회");
+			//System.out.println("페이지 조회");
 			list = searchService.boardListPage(map);
 		}
 		
@@ -285,7 +287,7 @@ public class SearchController {
 					tempjson.put("board_like", boardALLDTO.getBoard_like());
 					tempjson.put("board_comment", boardALLDTO.getBoard_comment());
 					photoArray.put(boardALLDTO.getPhoto());
-					System.out.println(boardALLDTO.getPhoto());
+					//System.out.println(boardALLDTO.getPhoto());
 				} else {
 					photoArray.put(boardALLDTO.getPhoto());
 				}
@@ -614,6 +616,12 @@ public class SearchController {
 					intlist1.add(member);
 					memberArray.put(member);
 				}
+			}
+			if(tagArray == null && region_siArray == null && region_guArray == null
+					&& memberArray == null) {
+				json.put("RT", "FAIL");
+				System.out.println("-- 함수 종료 : foret_keyword_search.do --");
+				return modelAndView(json);
 			}
 			temp.put("tag", tagArray);
 			temp.put("region_si", region_siArray);

@@ -66,6 +66,7 @@ public class ForetController {
 	    json.put("foretRegionRT", foretRegionRT);
 	    json.put("foretPhotoRT", foretPhotoRT);
 	    json.put("foretMemberRT", foretMemberRT);
+	    json.put("foret_id", foret_id);
 	    
 		System.out.println("-- 함수 종료 : foret_insert.do --\n");
 		return modelAndView(json);
@@ -227,9 +228,12 @@ public class ForetController {
 		int foret_id = haveId(request.getParameter("id"));
 		String tag[] = request.getParameterValues("tag");
 		int result = 0;
+		
+		if(tag == null) return result;
+		
 		// 삭제 여부 알 수 없음
-		foretTagDelete(foret_id);
 		if(tag != null) {
+			foretTagDelete(foret_id);
 			result = foretTagWrite(foret_id, getTagId(tag));
 	    }
 		System.out.println("함수 종료 : modifyForetTag");
@@ -238,9 +242,11 @@ public class ForetController {
 	private int modifyForetRegion(HttpServletRequest request) {
 		System.out.println("함수 실행 : modifyForetRegion");
 		int foret_id = haveId(request.getParameter("id"));
+		int result = 0;
 		String region_si[] = request.getParameterValues("region_si");
 	    String region_gu[] = request.getParameterValues("region_gu");
-	    int result = 0;
+	    if(region_si == null) return result;
+	    
 		// 삭제 여부 알 수 없음
 	    foretRegionDelete(foret_id);
 	    if(region_si != null && region_gu != null) {
@@ -253,13 +259,14 @@ public class ForetController {
 		System.out.println("함수 실행 : modifyForetPhoto");
 		int foret_id = haveId(request.getParameter("id"));
 		int result = 0;
+		
 		if(photo != null) {
 			// 사진 수정
 			foretPhotoDelete(foret_id);
 			result = foretPhotoWrite(foret_id, request, photo);
 		} else {
 			// 사진 내리기
-			result = foretPhotoDelete(foret_id);
+			//result = foretPhotoDelete(foret_id);
 		}
 		System.out.println("함수 종료 : modifyForetPhoto");
 		return result;
